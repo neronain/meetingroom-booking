@@ -5,11 +5,11 @@
 
 ## Phase 0 — เตรียมโครงสร้าง
 
-- [ ] สร้างโครง monorepo: `backend/`, `frontend/`, `docker-compose.yml`, `.env.example`, `README.md`
-- [ ] Backend: ตั้ง Python 3.12 + venv + `requirements.txt` (fastapi, uvicorn, sqlalchemy, alembic, psycopg, passlib[bcrypt], pydantic-settings, pytest)
-- [ ] Frontend: `npm create vite@latest` (React + TS) + Tailwind CSS + `vitest`
-- [ ] ตั้ง Postgres 16 ผ่าน Docker (service เดียวพอสำหรับ dev) + ไฟล์ env
-- [ ] เชื่อม SQLAlchemy + Alembic, รัน migration แรกสำเร็จ
+- [x] สร้างโครง monorepo: `backend/`, `frontend/`, `docker-compose.yml`, `.env.example`, `README.md`
+- [x] Backend: ตั้ง Python 3.12 + venv + `requirements.txt` (fastapi, uvicorn, sqlalchemy, alembic, psycopg, passlib[bcrypt], pydantic-settings, pytest)
+- [x] Frontend: `npm create vite@latest` (React + TS) + Tailwind CSS + `vitest`
+- [x] ตั้ง Postgres 16 ผ่าน Docker (service เดียวพอสำหรับ dev) + ไฟล์ env — host port **5434** (OrbStack ครอง 127.0.0.1:5432 ไว้แล้ว)
+- [x] เชื่อม SQLAlchemy + Alembic, รัน migration แรกสำเร็จ
 
 ## Phase 1 — Auth และบัญชีผู้ใช้
 
