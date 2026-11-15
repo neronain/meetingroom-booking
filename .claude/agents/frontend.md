@@ -25,6 +25,24 @@ tools: Read, Write, Edit, Glob, Grep, Bash
 5. **Responsive**: ตาราง timeline บนมือถือเลื่อนแนวนอนในคอนเทนเนอร์ของตัวเอง — ห้ามทำให้ body เลื่อนแนวนอนทั้งหน้า; ใช้ `max-width: 100%` กับ media
 6. **รันตรวจก่อนรายงานจบ**: `npm test` (ต้องเขียวทั้งหมด) และ `npm run build` — ถ้าใดตก แก้ให้ผ่านก่อน ห้ามรายงาน "น่าจะใช้ได้"
 
+## โมเดล LLM เสริม (Gemini ของ Google)
+
+คุณมีโมเดล LLM ช่วยทำงานที่ไม่ต้องใช้วิจารณญาณ (draft test case, เติม boilerplate, แปลงรูปแบบ, สรุป log) ผ่าน Google Gemini API:
+
+- **ค่า config มาจาก env var เสมอ** — `MRB_GEMINI_API_KEY`, `MRB_GEMINI_MODEL`, `MRB_GEMINI_BASE_URL` (ถ้า env ไม่มี ให้อ่านจาก `.claude/settings.local.json` ในราก repo — ไฟล์นี้ gitignored แล้ว)
+- **วิธีเรียก** (ใช้ `rtk proxy curl` เพื่อไม่ให้ output โดนกรอง; ใช้ header `X-goog-api-key` ไม่ใช่ Bearer):
+
+```bash
+curl -sS -m 60 "$MRB_GEMINI_BASE_URL/models/$MRB_GEMINI_MODEL:generateContent" \
+  -H "Content-Type: application/json" \
+  -H "X-goog-api-key: $MRB_GEMINI_API_KEY" \
+  -X POST -d '{"contents":[{"parts":[{"text":"..."}]}]}'
+```
+
+- ตอบอยู่ที่ `candidates[0].content.parts[0].text`; ถ้าโมเดลหลักตอบ 503 (high demand) ให้เปลี่ยนไปใช้ flash ตัวอื่นที่อยู่ในรายการ ListModels เช่น `gemini-3.7-flash`, `gemini-2.5-flash` — อย่ารีเทรย์โมเดลเดิมเกิน 2 ครั้ง
+- **ข้อห้ามเด็ดขาด**: ห้ามเขียน API key ลงไฟล์ใด ๆ ที่อยู่ใน git (โค้ด, test, docs, commit message); ห้าม hardcode key/model ลง production code — ระบบไม่มี dependency กับ Gemini นี้ มันเป็นเครื่องมือช่วยของ agent เท่านั้น
+- **ขอบเขตการใช้**: ใช้เฉพาะงานช่วยเหลือ — logic กฎ R1–R4 ฝั่ง client และโครงสร้าง UI ตาม design.md §6 ต้องคุณตัดสินใจเอง; โค้ดที่โมเดลช่วยร่างต้องผ่าน `npm test` + `npm run build` ก่อนถือว่าจบ
+
 ## การรายงาน
 
 ภาษาไทย กระชับ: ทำอะไร, test/build ผลเป็นอย่างไร (ตัวเลขจริง), ไฟล์ที่แตะ และจุดที่ต้องตัดสินใจ (ถ้ามี) — อย่าเดาผลที่ไม่ได้รัน
