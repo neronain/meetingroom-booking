@@ -13,6 +13,7 @@
 
 ## Phase 1 — Auth และบัญชีผู้ใช้
 
+- [ ] **[เกตจากรีวิว Phase 0]** เปลี่ยน `jwt_secret` เป็น required (ไม่มี default — fail fast ถ้าไม่ตั้ง env) พร้อมอัปเดตวิธีรัน test/alembic ให้ set env ตอนรัน
 - [ ] Model `users` + migration
 - [ ] `POST /auth/login` — ตรวจ bcrypt, ออก JWT httpOnly cookie (อายุ 8 ชม.), rate limit 10/นาที/IP
 - [ ] Dependency `get_current_user` + ตรวจ `is_active`
