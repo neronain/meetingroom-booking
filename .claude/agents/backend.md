@@ -27,6 +27,24 @@ tools: Read, Write, Edit, Glob, Grep, Bash
 7. **Migration**: ทุก model ใหม่/แก้ → alembic revision ใหม่ (ไฟล์ชื่อ `0002_*.py` เป็นต้นไป) รัน `.venv/bin/alembic upgrade head` กับ DB จริงให้ผ่านเสมอ — Postgres ผ่าน docker compose พอร์ต **5434** (ดู .env.example; OrbStack ครอง 127.0.0.1:5432 ไว้)
 8. **รันตรวจก่อนรายงานจบ**: `.venv/bin/python -m pytest -q` เขียวทั้งหมด + `alembic upgrade head` ผ่าน — ห้ามรายงาน "น่าจะใช้ได้"
 
+## โมเดล LLM เสริม (Qwen3-Coder บนเซิร์ฟเวอร์ภายนอก)
+
+คุณมีโมเดล LLM ช่วยทำงานที่ไม่ต้องใช้วิจารณญาณ (draft test case, เติม boilerplate, แปลงรูปแบบ, สรุป log ยาว ๆ) ผ่าน API แบบ OpenAI-compatible:
+
+- **ค่า config มาจาก env var เสมอ** — `MRB_LLM_BASE_URL`, `MRB_LLM_API_TOKEN`, `MRB_LLM_MODEL` (ถ้า env ไม่มี ให้อ่านจาก `.claude/settings.local.json` ในราก repo — ไฟล์นี้ gitignored แล้ว)
+- **วิธีเรียก** (ใช้ `rtk proxy curl` เพื่อไม่ให้ output โดนกรอง):
+
+```bash
+curl -sS -m 120 "$MRB_LLM_BASE_URL/v1/chat/completions" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $MRB_LLM_API_TOKEN" \
+  -d '{"model":"'$MRB_LLM_MODEL'","messages":[{"role":"user","content":"..."}]}'
+```
+
+- **ข้อห้ามเด็ดขาด**: ห้ามเขียน token ลงไฟล์ใด ๆ ที่อยู่ใน git (โค้ด, test, docs, commit message) และห้ามส่ง token ไปที่อื่นนอกจาก endpoint นี้; ห้าม hardcode base_url/token ลง production code — ระบบไม่มี dependency กับ LLM นี้ มันเป็นเครื่องมือช่วยของ agent เท่านั้น
+- **ขอบเขตการใช้**: ใช้เฉพาะงานช่วยเหลือ ไม่ใช่ตัดสินใจแทน — logic ของกฎ R1–R7, security, และ migration ต้องมาจากสเปค `design.md` ที่คุณเขียนเอง; โค้ดที่โมเดลช่วยร่างต้องผ่าน pytest ก่อนถือว่าจบ
+- ถ้า endpoint ล่ม/timeout ให้ทำงานด้วยตัวเองต่อ และแจ้งไว้ในรายงาน
+
 ## การรายงาน
 
 ภาษาไทย กระชับ: ทำอะไร, test/alembic ผลจริง (ตัวเลข), ไฟล์ที่แตะ, สัญญา API ใหม่ (method/path/สิทธิ์/ตอบอะไร) ถ้ามี — อย่าเดาผลที่ไม่ได้รัน
