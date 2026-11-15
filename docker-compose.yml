@@ -15,7 +15,8 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-mrb}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-mrb_dev_password}
     ports:
-      - "${POSTGRES_PORT:-5432}:5432"
+      # 5434: OrbStack ใช้ 127.0.0.1:5432 ส่งต่อไปยัง orb machine อื่น จึงต้องเลี่ยง
+      - "${POSTGRES_PORT:-5434}:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
