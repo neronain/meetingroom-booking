@@ -1,0 +1,28 @@
+# meeting-room-booking — dev compose
+# Phase 0: รันเฉพาะ Postgres สำหรับ development
+# รอบ deploy (Phase 6) จะเพิ่ม service backend + frontend ในไฟล์นี้
+#
+# ใช้งาน:  docker compose up -d db
+# หยุด:    docker compose down  (ข้อมูลคงอยู่ใน volume)
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: mrb-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-meeting_room}
+      POSTGRES_USER: ${POSTGRES_USER:-mrb}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-mrb_dev_password}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-mrb} -d ${POSTGRES_DB:-meeting_room}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  pgdata:
